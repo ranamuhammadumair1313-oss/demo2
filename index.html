@@ -3,957 +3,771 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMAIR AI IMAGE STUDIO</title>
+    <title>UMAIR AI STUDIO</title>
     <style>
-        /* CSS Variables for Theme */
+        /* CSS Variables & Theme */
         :root {
-            --bg-dark: #05050a;
+            --bg-gradient: linear-gradient(135deg, #090910 0%, #1a1a2e 50%, #16213e 100%);
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
             --neon-blue: #00f0ff;
             --neon-purple: #8a2be2;
             --text-main: #ffffff;
             --text-muted: #a0a0b0;
-            --success: #00e676;
-            --danger: #ff1744;
-            --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --ai-bubble: rgba(138, 43, 226, 0.15);
+            --user-bubble: rgba(0, 240, 255, 0.15);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            font-family: var(--font-family);
-            background: var(--bg-dark);
+            background: var(--bg-gradient);
             color: var(--text-main);
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(138, 43, 226, 0.15), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(0, 240, 255, 0.15), transparent 25%);
-            animation: bgPulse 15s infinite alternate;
+            overflow: hidden;
         }
 
-        @keyframes bgPulse {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 100% 100%; }
-        }
-
-        /* Navbar */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.2rem 2rem;
-            background: rgba(5, 5, 10, 0.7);
+        /* Glassmorphism Classes */
+        .glass {
+            background: var(--glass-bg);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
         }
 
-        .brand {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .brand h1 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+        .neon-text {
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
         }
 
-        .brand span {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            letter-spacing: 4px;
-        }
-
-        .nav-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .api-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            padding: 6px 12px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--danger);
-            box-shadow: 0 0 8px var(--danger);
-        }
-
-        .status-dot.connected {
-            background: var(--success);
-            box-shadow: 0 0 8px var(--success);
-        }
-
-        .btn-icon {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-            padding: 10px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-icon:hover {
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 15px rgba(138, 43, 226, 0.4);
-            transform: scale(1.05);
-        }
-
-        /* Main Layout */
-        main {
-            display: flex;
-            flex: 1;
-            padding: 2rem;
-            gap: 2rem;
-            max-width: 1600px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* Left Sidebar: Settings / Extras */
+        /* Sidebar */
         .sidebar {
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 1.5rem;
-        }
-
-        .panel-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--neon-blue);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .example-prompt {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--glass-border);
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .example-prompt:hover {
-            border-color: var(--neon-purple);
-            color: var(--text-main);
-            transform: translateX(5px);
-        }
-
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .history-item {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding: 8px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        /* Center Content: Generator */
-        .generator-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        /* Image Preview Area */
-        .image-preview-container {
-            flex: 1;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-            min-height: 400px;
-            transition: all 0.5s ease;
-        }
-
-        .empty-state {
-            text-align: center;
-            color: var(--text-muted);
-            animation: fadeIn 1s;
-        }
-
-        .empty-state svg {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-            color: var(--neon-blue);
-        }
-
-        .loading-state {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top: 3px solid var(--neon-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
-        }
-
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .generated-image {
-            width: 100%;
+            width: 280px;
             height: 100%;
-            object-fit: contain;
-            display: none;
-            cursor: zoom-in;
-            animation: imageReveal 0.8s cubic-bezier(0.1, 0.8, 0.1, 1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border-right: 1px solid var(--glass-border);
+            transition: transform 0.3s ease;
         }
 
-        @keyframes imageReveal {
-            0% { opacity: 0; transform: scale(0.95); filter: blur(10px); }
-            100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        .brand {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--glass-border);
+            letter-spacing: 2px;
         }
 
-        .image-controls {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            display: none;
+        .nav-items {
+            display: flex;
+            flex-direction: column;
             gap: 10px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .view-section {
+            display: none;
+            flex-direction: column;
+            height: calc(100% - 65px);
+        }
+
+        .view-section.active {
+            display: flex;
+        }
+
+        /* Chat UI */
+        .chat-container {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px;
             border-radius: 12px;
-            backdrop-filter: blur(10px);
+            line-height: 1.5;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: var(--user-bubble);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            background: var(--ai-bubble);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            border-bottom-left-radius: 2px;
+        }
+
+        .message pre {
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        .message code {
+            font-family: monospace;
+            color: var(--neon-blue);
+        }
+
+        .msg-actions {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .msg-actions span {
+            cursor: pointer;
+        }
+
+        .msg-actions span:hover {
+            color: var(--neon-blue);
         }
 
         /* Input Area */
-        .input-container {
-            position: relative;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 8px;
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid var(--glass-border);
             display: flex;
-            align-items: flex-end;
-            transition: box-shadow 0.3s;
-        }
-
-        .input-container:focus-within {
-            box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
-            border-color: rgba(138, 43, 226, 0.5);
-        }
-
-        textarea {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            padding: 12px 16px;
-            font-size: 1rem;
-            resize: none;
-            height: 60px;
-            max-height: 200px;
-            outline: none;
-            font-family: inherit;
-        }
-
-        textarea::placeholder {
-            color: var(--text-muted);
-        }
-
-        .input-actions {
-            display: flex;
-            padding: 8px;
             gap: 10px;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+        .input-box {
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
             color: white;
+            padding: 15px;
+            border-radius: 8px;
+            resize: none;
+            height: 50px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        .input-box:focus {
+            outline: none;
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.2);
+        }
+
+        .send-btn {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
             border: none;
-            padding: 12px 24px;
-            border-radius: 14px;
-            font-weight: 600;
+            color: white;
+            padding: 0 25px;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.3s, transform 0.1s;
+        }
+
+        .send-btn:hover {
+            opacity: 0.9;
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Image Gen UI */
+        .image-gen-container {
+            padding: 20px;
             display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            overflow-y: auto;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 25px rgba(0, 240, 255, 0.4);
+        .model-selector {
+            background: rgba(0,0,0,0.2);
+            color: white;
+            border: 1px solid var(--glass-border);
+            padding: 10px;
+            border-radius: 8px;
+            outline: none;
         }
 
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Modals */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
+        .image-preview-card {
+            flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
+            border: 2px dashed var(--glass-border);
+            border-radius: 12px;
+            min-height: 300px;
+            position: relative;
+            background: rgba(0,0,0,0.1);
         }
 
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: all;
+        .image-preview-card img {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 8px;
+            display: none;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
         }
 
-        .modal-content {
-            background: #0f0f1a;
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 450px;
-            transform: translateY(20px);
-            transition: transform 0.3s;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(138, 43, 226, 0.1) inset;
+        .image-actions {
+            display: none;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
         }
 
-        .modal-overlay.active .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
+        /* Settings Modal */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
             align-items: center;
-            margin-bottom: 1.5rem;
+            z-index: 100;
         }
 
-        .modal-header h2 {
-            font-size: 1.2rem;
-            color: var(--neon-purple);
-        }
-
-        .close-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 1.5rem;
-        }
-
-        .close-btn:hover { color: white; }
-
-        .form-group {
+        .modal {
+            width: 400px;
+            padding: 30px;
+            border-radius: 15px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-bottom: 1.5rem;
+            gap: 20px;
         }
 
-        .form-group label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
+        .modal h2 {
+            margin-bottom: 10px;
         }
 
-        .form-group input {
+        .modal input {
+            width: 100%;
+            padding: 12px;
             background: rgba(0,0,0,0.3);
             border: 1px solid var(--glass-border);
             color: white;
-            padding: 12px;
-            border-radius: 10px;
-            outline: none;
+            border-radius: 6px;
         }
 
-        .form-group input:focus {
-            border-color: var(--neon-blue);
+        .api-status {
+            font-size: 14px;
+            color: #ff4d4d;
         }
 
-        .help-text {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 1.5rem;
+        .api-status.connected {
+            color: #00ff00;
         }
 
-        /* Fullscreen Image Modal */
-        #fullscreen-modal .modal-content {
-            max-width: 90vw;
-            max-height: 90vh;
-            background: transparent;
-            border: none;
-            box-shadow: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #fullscreen-image {
-            max-width: 100%;
-            max-height: 90vh;
-            border-radius: 10px;
-            box-shadow: 0 0 40px rgba(0,0,0,0.8);
-        }
-
-        /* Toast Notifications */
-        .toast-container {
+        /* Toast Notification */
+        .toast {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 2000;
-        }
-
-        .toast {
-            background: rgba(15, 15, 26, 0.9);
-            border-left: 4px solid var(--neon-blue);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
+            background: var(--glass-bg);
             backdrop-filter: blur(10px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            animation: slideIn 0.3s, fadeOut 0.3s 2.7s forwards;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            border: 1px solid var(--neon-blue);
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
         }
 
-        .toast.error { border-color: var(--danger); }
-        .toast.success { border-color: var(--success); }
-
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-
-        /* Responsive Design */
-        @media (max-width: 900px) {
-            main {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-            }
-            .image-preview-container {
-                min-height: 300px;
-            }
+        .toast.show {
+            transform: translateX(0);
         }
 
-        @media (max-width: 480px) {
-            nav { padding: 1rem; }
-            .brand h1 { font-size: 1.2rem; }
-            .api-status span { display: none; }
-        }
+        /* Loaders & Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+        .typing-indicator {
+            display: none;
+            padding: 15px;
+            background: var(--ai-bubble);
+            border-radius: 12px;
+            align-self: flex-start;
+            width: fit-content;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Mobile Responsive */
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 50;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                left: -280px;
+                z-index: 40;
+                background: var(--bg-gradient);
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .header { padding-left: 50px; }
+            .message { max-width: 90%; }
+        }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="brand">
-            <h1>UMAIR AI</h1>
-            <span>IMAGE STUDIO</span>
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+
+    <div class="sidebar glass" id="sidebar">
+        <div class="brand neon-text">UMAIR AI</div>
+        
+        <div class="nav-items">
+            <button class="nav-btn active" onclick="switchView('chat')">💬 AI Chat</button>
+            <button class="nav-btn" onclick="switchView('image')">🎨 Generate Image</button>
+            <button class="nav-btn" onclick="clearChat()">🗑️ Clear Chat</button>
         </div>
-        <div class="nav-controls">
-            <div class="api-status" id="api-status-badge">
-                <div class="status-dot" id="status-indicator"></div>
-                <span id="status-text">API Missing</span>
+
+        <button class="nav-btn" onclick="openSettings()">⚙️ Settings</button>
+    </div>
+
+    <div class="main-content">
+        <div class="header glass neon-text" id="header-title">UMAIR AI STUDIO</div>
+
+        <div id="view-chat" class="view-section active">
+            <div class="chat-container" id="chat-box">
+                </div>
+            
+            <div class="typing-indicator" id="typing-indicator">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
             </div>
-            <button class="btn-icon" id="settings-btn" title="Settings">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            </button>
+
+            <div class="input-area glass">
+                <textarea class="input-box" id="chat-input" placeholder="Message Umair AI... (Press Enter to send)" onkeypress="handleEnter(event)"></textarea>
+                <button class="send-btn" onclick="sendChatMessage()">Send</button>
+            </div>
         </div>
-    </nav>
 
-    <main>
-        <aside class="sidebar">
-            <div class="glass-panel">
-                <div class="panel-title">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    Example Prompts
-                </div>
-                <div class="example-prompt" onclick="useExample('A futuristic neon-lit cyber city, flying cars, rain, cinematic lighting, 8k resolution')">
-                    Cyberpunk Cityscape
-                </div>
-                <div class="example-prompt" onclick="useExample('A glowing mystical wolf inside a dark enchanted forest, magical blue particles, hyper-realistic')">
-                    Mystical Wolf
-                </div>
-                <div class="example-prompt" onclick="useExample('Minimalist modern living room, large windows, sunset lighting, glass tables, architectural digest style')">
-                    Modern Interior
-                </div>
-            </div>
-
-            <div class="glass-panel">
-                <div class="panel-title">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    Prompt History
-                </div>
-                <div class="history-list" id="history-list">
-                    <div style="color: var(--text-muted); font-size: 0.8rem; text-align: center; margin-top: 10px;">No history yet.</div>
-                </div>
-            </div>
-        </aside>
-
-        <section class="generator-area">
-            <div class="image-preview-container" id="preview-container">
-                <div class="empty-state" id="empty-state">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                    <h2>Ready to Create</h2>
-                    <p style="margin-top: 8px;">Enter a prompt below to generate an AI image.</p>
-                </div>
-
-                <div class="loading-state" id="loading-state">
-                    <div class="spinner"></div>
-                    <div id="loading-text" style="color: var(--neon-blue); letter-spacing: 1px;">Synthesizing image...</div>
-                </div>
-
-                <img id="result-image" class="generated-image" alt="AI Generated Output" onclick="openFullscreen()">
+        <div id="view-image" class="view-section">
+            <div class="image-gen-container">
+                <select class="model-selector" id="image-model">
+                    <option value="stabilityai/stable-diffusion-3-medium">Stable Diffusion 3 Medium (OpenRouter)</option>
+                    <option value="flux/flux-schnell">Flux Schnell (OpenRouter)</option>
+                </select>
                 
-                <div class="image-controls" id="image-controls">
-                    <button class="btn-icon" onclick="downloadImage()" title="Download">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    </button>
-                    <button class="btn-icon" onclick="regenerateImage()" title="Regenerate">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
-                    </button>
+                <div class="image-preview-card" id="image-preview-area">
+                    <span id="image-placeholder" style="color: var(--text-muted);">Your generated image will appear here</span>
+                    <img id="generated-img" src="" alt="AI Generated">
+                    <div class="typing-indicator" id="image-loader" style="position:absolute; display:none;">
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="input-container">
-                <textarea id="prompt-input" placeholder="Describe the image you want to see... (e.g., A futuristic UI design for an AI app)"></textarea>
-                <div class="input-actions">
-                    <button class="btn-icon" id="copy-prompt-btn" title="Copy Prompt">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    </button>
-                    <button class="btn-primary" id="generate-btn">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                        Generate
-                    </button>
+                <div class="image-actions" id="image-actions">
+                    <button class="send-btn" onclick="downloadImage()">⬇️ Download</button>
+                </div>
+
+                <div class="input-area glass" style="border:none; padding:0;">
+                    <textarea class="input-box" id="image-input" placeholder="Describe the image you want to generate..."></textarea>
+                    <button class="send-btn" onclick="generateImage()">Generate</button>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </div>
 
     <div class="modal-overlay" id="settings-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Settings</h2>
-                <button class="close-btn" onclick="closeSettings()">&times;</button>
+        <div class="modal glass">
+            <h2 class="neon-text">API Settings</h2>
+            <p style="font-size: 14px; color: var(--text-muted);">Enter your OpenRouter API Key to power UMAIR AI.</p>
+            <input type="password" id="api-key-input" placeholder="sk-or-v1-...">
+            <div class="api-status" id="api-status">Status: Not Connected</div>
+            <div style="display:flex; gap:10px; margin-top: 10px;">
+                <button class="send-btn" style="flex:1" onclick="saveApiKey()">Save</button>
+                <button class="send-btn" style="flex:1; background: #333;" onclick="closeSettings()">Cancel</button>
             </div>
-            <div class="form-group">
-                <label for="api-key-input">Google Gemini API Key</label>
-                <input type="password" id="api-key-input" placeholder="AIzaSy...">
-            </div>
-            <div class="help-text">
-                Your key is stored locally in your browser and is never sent to any external server other than Google's official APIs.
-            </div>
-            <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="saveSettings()">
-                Save Configuration
-            </button>
         </div>
     </div>
 
-    <div class="modal-overlay" id="fullscreen-modal" onclick="closeFullscreen()">
-        <div class="modal-content" style="padding: 0;">
-            <img id="fullscreen-image" src="" alt="Fullscreen AI Output">
-        </div>
-    </div>
-
-    <div class="toast-container" id="toast-container"></div>
+    <div class="toast" id="toast">Notification text</div>
 
     <script>
-        // App State
-        let apiKey = '';
-        let currentPrompt = '';
-        let currentImageUrl = '';
-        let promptHistory = [];
-        let isGenerating = false;
-
-        // DOM Elements
-        const promptInput = document.getElementById('prompt-input');
-        const generateBtn = document.getElementById('generate-btn');
-        const apiStatusBadge = document.getElementById('api-status-badge');
-        const statusIndicator = document.getElementById('status-indicator');
-        const statusText = document.getElementById('status-text');
+        // --- STATE & INITIALIZATION ---
+        const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+        const CHAT_MODEL = "meta-llama/llama-3-8b-instruct:free"; 
         
-        // Preview Elements
-        const emptyState = document.getElementById('empty-state');
-        const loadingState = document.getElementById('loading-state');
-        const resultImage = document.getElementById('result-image');
-        const imageControls = document.getElementById('image-controls');
-        const loadingText = document.getElementById('loading-text');
+        let apiKey = localStorage.getItem('umair_openrouter_key') || '';
+        let chatHistory = JSON.parse(localStorage.getItem('umair_chat_history')) || [];
 
-        // Modals
-        const settingsModal = document.getElementById('settings-modal');
-        const apiKeyInput = document.getElementById('api-key-input');
-        const fullscreenModal = document.getElementById('fullscreen-modal');
-        const fullscreenImage = document.getElementById('fullscreen-image');
-
-        // Initialization
         window.onload = () => {
-            loadSettings();
-            loadHistory();
-            
-            // Auto-resize textarea
-            promptInput.addEventListener('input', function() {
-                this.style.height = '60px';
-                this.style.height = (this.scrollHeight) + 'px';
-            });
-
-            // Handle Enter key for generation (Shift+Enter for new line)
-            promptInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    triggerGeneration();
-                }
-            });
-
-            // Event Listeners
-            document.getElementById('settings-btn').addEventListener('click', openSettings);
-            document.getElementById('copy-prompt-btn').addEventListener('click', copyPrompt);
-            generateBtn.addEventListener('click', triggerGeneration);
+            updateApiStatus();
+            renderChatHistory();
+            if(chatHistory.length === 0) {
+                appendMessage('ai', "Hello! I am **UMAIR AI**, your futuristic assistant powered by OpenRouter. How can I help you today?");
+            }
         };
 
-        // --- Settings Management ---
-        function loadSettings() {
-            const savedKey = localStorage.getItem('umair_ai_gemini_key');
-            if (savedKey) {
-                apiKey = savedKey;
-                apiKeyInput.value = apiKey;
-                updateApiStatus(true);
-            } else {
-                updateApiStatus(false);
-            }
+        // --- UI NAVIGATION ---
+        function switchView(view) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`view-${view}`).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            document.getElementById('header-title').innerText = view === 'chat' ? "UMAIR AI STUDIO - CHAT" : "UMAIR AI STUDIO - IMAGE GEN";
+            if(window.innerWidth <= 768) toggleSidebar();
         }
 
-        function saveSettings() {
-            const key = apiKeyInput.value.trim();
-            if (key) {
-                apiKey = key;
-                localStorage.setItem('umair_ai_gemini_key', key);
-                updateApiStatus(true);
-                showToast('API Key saved successfully!', 'success');
-                closeSettings();
-            } else {
-                localStorage.removeItem('umair_ai_gemini_key');
-                apiKey = '';
-                updateApiStatus(false);
-                showToast('API Key removed.', 'error');
-                closeSettings();
-            }
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
         }
 
-        function updateApiStatus(connected) {
-            if (connected) {
-                statusIndicator.classList.add('connected');
-                statusText.innerText = 'API Connected';
-                apiStatusBadge.style.borderColor = 'rgba(0, 230, 118, 0.4)';
-            } else {
-                statusIndicator.classList.remove('connected');
-                statusText.innerText = 'API Missing';
-                apiStatusBadge.style.borderColor = 'rgba(255, 23, 68, 0.4)';
-            }
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
+        // --- SETTINGS & API KEY ---
         function openSettings() {
-            settingsModal.classList.add('active');
+            document.getElementById('settings-modal').style.display = 'flex';
+            document.getElementById('api-key-input').value = apiKey;
+            if(window.innerWidth <= 768) toggleSidebar();
         }
 
         function closeSettings() {
-            settingsModal.classList.remove('active');
+            document.getElementById('settings-modal').style.display = 'none';
         }
 
-        // --- Core Application Logic ---
-        function useExample(text) {
-            promptInput.value = text;
-            promptInput.style.height = '60px';
-            promptInput.style.height = (promptInput.scrollHeight) + 'px';
-            promptInput.focus();
-        }
-
-        function copyPrompt() {
-            if (!promptInput.value.trim()) return;
-            navigator.clipboard.writeText(promptInput.value).then(() => {
-                showToast('Prompt copied to clipboard!', 'success');
-            });
-        }
-
-        function triggerGeneration() {
-            const prompt = promptInput.value.trim();
-            if (!prompt) {
-                showToast('Please enter a prompt first.', 'error');
-                return;
-            }
-            if (!apiKey) {
-                showToast('API Key missing. Please configure settings.', 'error');
-                openSettings();
-                return;
-            }
-            if (isGenerating) return;
-
-            generateImage(prompt);
-        }
-
-        function regenerateImage() {
-            if (currentPrompt) {
-                generateImage(currentPrompt);
+        function saveApiKey() {
+            const key = document.getElementById('api-key-input').value.trim();
+            if(key) {
+                apiKey = key;
+                localStorage.setItem('umair_openrouter_key', key);
+                updateApiStatus();
+                showToast("API Key Saved Successfully!");
+                closeSettings();
+            } else {
+                showToast("Please enter a valid key.");
             }
         }
 
-        async function generateImage(prompt) {
-            // UI Loading State setup
-            isGenerating = true;
-            currentPrompt = prompt;
-            generateBtn.disabled = true;
-            generateBtn.innerHTML = '<div class="spinner" style="width:15px;height:15px;border-width:2px;"></div> Generating...';
+        function updateApiStatus() {
+            const statusEl = document.getElementById('api-status');
+            if(apiKey) {
+                statusEl.innerText = "Status: API Connected 🟢";
+                statusEl.className = "api-status connected";
+            } else {
+                statusEl.innerText = "Status: API Not Connected 🔴";
+                statusEl.className = "api-status";
+            }
+        }
+
+        // --- CHAT SYSTEM ---
+        function handleEnter(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        function renderChatHistory() {
+            const box = document.getElementById('chat-box');
+            box.innerHTML = '';
+            chatHistory.forEach(msg => appendMessageUI(msg.role, msg.content, false));
+            scrollToBottom();
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            localStorage.removeItem('umair_chat_history');
+            document.getElementById('chat-box').innerHTML = '';
+            appendMessage('ai', "Chat history cleared. Let's start fresh!");
+            showToast("Chat Cleared");
+            if(window.innerWidth <= 768) toggleSidebar();
+        }
+
+        function appendMessage(role, content) {
+            chatHistory.push({role, content});
+            localStorage.setItem('umair_chat_history', JSON.stringify(chatHistory));
+            appendMessageUI(role, content, true);
+        }
+
+        function formatMarkdown(text) {
+            // Basic markdown parser for bold, italic, code blocks, and newlines
+            let formatted = text
+                .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>') // Code blocks
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+                .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
+                .replace(/\n/g, '<br>'); // Newlines
+            return formatted;
+        }
+
+        function appendMessageUI(role, content, animate) {
+            const box = document.getElementById('chat-box');
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
             
-            emptyState.style.display = 'none';
-            resultImage.style.display = 'none';
-            imageControls.style.display = 'none';
-            loadingState.style.display = 'flex';
+            const textDiv = document.createElement('div');
+            textDiv.innerHTML = formatMarkdown(content);
+            div.appendChild(textDiv);
+
+            if(role === 'ai') {
+                const actions = document.createElement('div');
+                actions.className = 'msg-actions';
+                actions.innerHTML = `<span onclick="copyText(this)">📋 Copy</span>`;
+                div.appendChild(actions);
+            }
+
+            box.appendChild(div);
+            scrollToBottom();
+        }
+
+        function copyText(btn) {
+            const text = btn.parentElement.parentElement.innerText.replace('📋 Copy', '');
+            navigator.clipboard.writeText(text.trim());
+            showToast("Copied to clipboard!");
+        }
+
+        function scrollToBottom() {
+            const box = document.getElementById('chat-box');
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function sendChatMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const text = inputEl.value.trim();
+            if(!text) return;
+            if(!apiKey) return showToast("Please set OpenRouter API Key in Settings!");
+
+            appendMessage('user', text);
+            inputEl.value = '';
             
-            // Randomize loading text for sci-fi feel
-            const loadingMessages = ["Initializing models...", "Synthesizing pixels...", "Applying glassmorphism...", "Rendering neon details..."];
-            let msgIdx = 0;
-            const msgInterval = setInterval(() => {
-                msgIdx = (msgIdx + 1) % loadingMessages.length;
-                loadingText.innerText = loadingMessages[msgIdx];
-            }, 1500);
+            const typing = document.getElementById('typing-indicator');
+            typing.style.display = 'block';
+            scrollToBottom();
+
+            // Prepare context for API
+            const messages = chatHistory.map(m => ({
+                role: m.role === 'ai' ? 'assistant' : 'user',
+                content: m.content
+            }));
 
             try {
-                // Implementation using standard Google AI fetch
-                // Target model: gemini-3-pro-image-preview
-                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${apiKey}`;
-                
-                // Note: The precise schema for gemini-3-pro-image-preview might require specific parameters.
-                // We use standard Gemini JSON payload structure assuming it supports text-to-image outputs via generateContent.
-                const response = await fetch(endpoint, {
+                const response = await fetch(OPENROUTER_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json',
+                        'HTTP-Referer': window.location.href,
+                        'X-Title': 'UMAIR AI'
+                    },
                     body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: prompt }]
-                        }]
-                        // Add generation config here if the API requires specific parameters for image dimensions.
+                        model: CHAT_MODEL,
+                        messages: messages
                     })
                 });
 
                 const data = await response.json();
+                typing.style.display = 'none';
 
-                if (!response.ok) {
-                    throw new Error(data.error?.message || 'API request failed');
+                if(data.error) {
+                    appendMessage('ai', `**Error:** ${data.error.message}`);
+                } else if(data.choices && data.choices.length > 0) {
+                    const aiText = data.choices[0].message.content;
+                    appendMessage('ai', aiText);
                 }
+            } catch (err) {
+                typing.style.display = 'none';
+                appendMessage('ai', `**System Error:** Could not reach API. Check console or network.`);
+                console.error(err);
+            }
+        }
 
-                // Handle Image Extraction
-                // Depending on the exact return schema of the Gemini 3 image model, 
-                // it might return base64 inlineData, or a URL. 
-                // We will attempt to parse standard Gemini multimodal response patterns.
-                let base64Image = null;
-                
-                try {
-                    // Try to find inlineData image in response parts
-                    const parts = data.candidates[0].content.parts;
-                    for (let part of parts) {
-                        if (part.inlineData && part.inlineData.mimeType.startsWith('image/')) {
-                            base64Image = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                            break;
-                        }
+        // --- IMAGE GENERATION SYSTEM ---
+        async function generateImage() {
+            const inputEl = document.getElementById('image-input');
+            const prompt = inputEl.value.trim();
+            const model = document.getElementById('image-model').value;
+            
+            if(!prompt) return showToast("Please enter an image prompt.");
+            if(!apiKey) return showToast("Please set OpenRouter API Key in Settings!");
+
+            document.getElementById('image-placeholder').style.display = 'none';
+            document.getElementById('generated-img').style.display = 'none';
+            document.getElementById('image-actions').style.display = 'none';
+            document.getElementById('image-loader').style.display = 'block';
+
+            try {
+                const response = await fetch(OPENROUTER_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json',
+                        'HTTP-Referer': window.location.href,
+                        'X-Title': 'UMAIR AI'
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [{role: "user", content: `Generate an image based on this prompt. Return ONLY the raw markdown image format ![image](url) and nothing else. Prompt: ${prompt}`}]
+                    })
+                });
+
+                const data = await response.json();
+                document.getElementById('image-loader').style.display = 'none';
+
+                if(data.error) {
+                    showToast(`Error: ${data.error.message}`);
+                    document.getElementById('image-placeholder').style.display = 'block';
+                    document.getElementById('image-placeholder').innerText = "Failed to generate image.";
+                } else if(data.choices && data.choices.length > 0) {
+                    const content = data.choices[0].message.content;
+                    // OpenRouter image models often return markdown links
+                    const urlMatch = content.match(/!\[.*?\]\((.*?)\)/);
+                    let imgUrl = urlMatch ? urlMatch[1] : content;
+
+                    // Fallback to text if URL extraction failed and content doesn't look like a URL
+                    if(!imgUrl.startsWith('http')) {
+                        showToast("Model returned text instead of image.");
+                        document.getElementById('image-placeholder').style.display = 'block';
+                        document.getElementById('image-placeholder').innerText = content;
+                        return;
                     }
-                } catch(e) {
-                    console.log("Standard path extraction failed, checking raw data...");
-                }
 
-                if (!base64Image) {
-                    throw new Error("Could not extract image data from the API response. Model may have returned text instead.");
+                    const imgEl = document.getElementById('generated-img');
+                    imgEl.src = imgUrl;
+                    imgEl.style.display = 'block';
+                    document.getElementById('image-actions').style.display = 'flex';
+                    showToast("Image Generated!");
                 }
-
-                // Display Image
-                currentImageUrl = base64Image;
-                resultImage.src = currentImageUrl;
-                
-                loadingState.style.display = 'none';
-                resultImage.style.display = 'block';
-                imageControls.style.display = 'flex';
-                
-                addToHistory(prompt);
-                showToast('Image generated successfully!', 'success');
-
-            } catch (error) {
-                console.error("Generation Error:", error);
-                showToast(error.message, 'error');
-                
-                // Revert UI on failure
-                loadingState.style.display = 'none';
-                if (currentImageUrl) {
-                    resultImage.style.display = 'block';
-                    imageControls.style.display = 'flex';
-                } else {
-                    emptyState.style.display = 'block';
-                }
-            } finally {
-                clearInterval(msgInterval);
-                isGenerating = false;
-                generateBtn.disabled = false;
-                generateBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Generate';
+            } catch (err) {
+                document.getElementById('image-loader').style.display = 'none';
+                document.getElementById('image-placeholder').style.display = 'block';
+                showToast("System Error during generation.");
+                console.error(err);
             }
         }
 
-        // --- History Management ---
-        function addToHistory(prompt) {
-            // Keep last 10
-            if (promptHistory.length >= 10) promptHistory.pop();
-            promptHistory.unshift(prompt);
-            renderHistory();
-        }
-
-        function renderHistory() {
-            const historyContainer = document.getElementById('history-list');
-            historyContainer.innerHTML = '';
-            
-            if (promptHistory.length === 0) {
-                historyContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 0.8rem; text-align: center; margin-top: 10px;">No history yet.</div>';
-                return;
-            }
-
-            promptHistory.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.title = item;
-                div.innerText = item;
-                div.onclick = () => useExample(item);
-                historyContainer.appendChild(div);
-            });
-        }
-
-        function loadHistory() {
-            // We just keep history in session for now as base64 images are too large for localStorage,
-            // but we can store prompt text.
-            const savedHistory = sessionStorage.getItem('umair_ai_history');
-            if (savedHistory) {
-                promptHistory = JSON.parse(savedHistory);
-                renderHistory();
-            }
-        }
-
-        // Save history before unload
-        window.addEventListener('beforeunload', () => {
-            sessionStorage.setItem('umair_ai_history', JSON.stringify(promptHistory));
-        });
-
-        // --- Utility Functions ---
         function downloadImage() {
-            if (!currentImageUrl) return;
-            const a = document.createElement('a');
-            a.href = currentImageUrl;
-            a.download = `UMAIR_AI_${Date.now()}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            showToast('Download started', 'success');
-        }
-
-        function openFullscreen() {
-            if (!currentImageUrl) return;
-            fullscreenImage.src = currentImageUrl;
-            fullscreenModal.classList.add('active');
-        }
-
-        function closeFullscreen() {
-            fullscreenModal.classList.remove('active');
-        }
-
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
+            const img = document.getElementById('generated-img');
+            if(!img.src) return;
             
-            const icon = type === 'success' 
-                ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'
-                : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
-            
-            toast.innerHTML = `${icon} <span>${message}</span>`;
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                if(container.contains(toast)) {
-                    container.removeChild(toast);
-                }
-            }, 3000);
+            // Proxy download via fetch to bypass CORS issues on direct download links
+            fetch(img.src)
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `UMAIR_AI_${Date.now()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    showToast("Downloading...");
+                })
+                .catch(() => {
+                    // Fallback if CORS prevents blob download
+                    window.open(img.src, '_blank');
+                });
         }
     </script>
 </body>
